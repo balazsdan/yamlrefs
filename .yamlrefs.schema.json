@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yamlrefs.dev/schemas/yamlrefs.schema.json",
+  "title": "YAML Reference Resolver configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version"
+  ],
+  "properties": {
+    "version": {
+      "const": 1,
+      "description": "Configuration format version."
+    },
+    "definitions": {
+      "description": "Definitions found in the edited YAML file or its transitive $include graph.",
+      "$ref": "#/$defs/internalDefinitions"
+    },
+    "externalDefinitions": {
+      "description": "Definitions loaded from configured external files.",
+      "$ref": "#/$defs/externalDefinitions"
+    }
+  },
+  "$defs": {
+    "yamlPathGlobs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "fileGlobs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "internalDefinitions": {
+      "type": "object",
+      "propertyNames": {
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/internalDefinition"
+      }
+    },
+    "internalDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "paths",
+        "references"
+      ],
+      "properties": {
+        "paths": {
+          "description": "YAML path globs that identify definition scalar values.",
+          "$ref": "#/$defs/yamlPathGlobs"
+        },
+        "references": {
+          "description": "YAML path globs whose scalar values reference this definition.",
+          "$ref": "#/$defs/yamlPathGlobs"
+        }
+      }
+    },
+    "externalDefinitions": {
+      "type": "object",
+      "propertyNames": {
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/externalDefinition"
+      }
+    },
+    "externalDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "references",
+        "source"
+      ],
+      "properties": {
+        "references": {
+          "description": "YAML path globs whose scalar values reference this external definition.",
+          "$ref": "#/$defs/yamlPathGlobs"
+        },
+        "source": {
+          "$ref": "#/$defs/externalSource"
+        }
+      }
+    },
+    "externalSource": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/iniSource"
+        }
+      ]
+    },
+    "iniSource": {
+      "title": "INI definition source",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "files",
+        "sections",
+        "keys",
+        "from"
+      ],
+      "properties": {
+        "type": {
+          "const": "ini"
+        },
+        "files": {
+          "description": "INI file globs relative to .yamlrefs.json.",
+          "$ref": "#/$defs/fileGlobs"
+        },
+        "sections": {
+          "description": "INI section-name globs.",
+          "$ref": "#/$defs/yamlPathGlobs"
+        },
+        "keys": {
+          "description": "INI key globs. Repeated keys and Unreal array prefixes are preserved.",
+          "$ref": "#/$defs/yamlPathGlobs"
+        },
+        "from": {
+          "enum": [
+            "key",
+            "value"
+          ],
+          "description": "Whether the definition value comes from the matched INI key or value."
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Optional regular expression. A named 'value' group, first capture, or full match becomes the definition."
+        }
+      }
+    }
+  }
+}

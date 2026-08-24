@@ -1,0 +1,52 @@
+{
+  "name": "yamlrefs",
+  "publisher": "balazs",
+  "displayName": "YAML Reference Resolver",
+  "description": "Configurable cross-reference completion and validation for YAML files.",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.120.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "jsonValidation": [
+      {
+        "fileMatch": "**/.yamlrefs.json",
+        "url": "./.yamlrefs.schema.json"
+      }
+    ]
+  },
+  "activationEvents": [
+    "onLanguage:yaml",
+    "workspaceContains:**/.yamlrefs.json"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.120.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.0.0",
+    "eslint": "^10.5.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1"
+  },
+  "overrides": {
+    "diff": "^8.0.4",
+    "serialize-javascript": "^7.0.6"
+  },
+  "dependencies": {
+    "minimatch": "^10.2.6",
+    "yaml": "^2.9.0"
+  }
+}
