@@ -5,7 +5,7 @@
   "description": "Configurable cross-reference completion and validation for YAML files.",
   "version": "1.0.0",
   "engines": {
-    "vscode": "^1.120.0"
+    "vscode": "^1.110.0"
   },
   "categories": [
     "Programming Languages"
@@ -34,7 +34,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "@types/vscode": "^1.120.0",
+    "@types/vscode": "^1.110.0",
     "@vscode/test-cli": "^0.0.15",
     "@vscode/test-electron": "^3.0.0",
     "eslint": "^10.5.0",
