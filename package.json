@@ -3,6 +3,10 @@
   "publisher": "balazs",
   "displayName": "YAML Reference Resolver",
   "description": "Configurable cross-reference completion and validation for YAML files.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/balazsdan/yamlrefs.git"
+  },
   "version": "1.0.0",
   "engines": {
     "vscode": "^1.110.0"
