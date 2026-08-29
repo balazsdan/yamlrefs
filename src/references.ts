@@ -31,13 +31,19 @@ function occurrenceFor(
         document.positionAt(scalar.start),
         document.positionAt(scalar.end)
     );
+    const replacementStart = scalar.style === 'plain'
+        ? scalar.start
+        : Math.min(scalar.start + 1, scalar.end);
 
     return {
         definitionName,
         path: scalar.path,
         value: scalar.value,
         range,
-        replacementRange: range,
+        replacementRange: new vscode.Range(
+            document.positionAt(replacementStart),
+            document.positionAt(scalar.end)
+        ),
         start: scalar.start,
         end: scalar.end,
         style: scalar.style
@@ -67,6 +73,14 @@ export function formatYamlScalar(value: string, style: YamlScalarStyle): string 
     return safePlain.test(value) && !reserved.test(value)
         ? value
         : JSON.stringify(value);
+}
+
+export function formatYamlCompletion(
+    value: string,
+    style: YamlScalarStyle
+): string {
+    const scalar = formatYamlScalar(value, style);
+    return style === 'plain' ? scalar : scalar.slice(1);
 }
 
 export class ReferenceScanner {

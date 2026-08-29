@@ -5,7 +5,7 @@ import type {
     ReferenceOccurrence,
     SourceIssue
 } from './model';
-import { formatYamlScalar } from './references';
+import { formatYamlCompletion } from './references';
 import { WorkspaceSession } from './workspaceSession';
 
 export interface WorkspaceSessionLookup {
@@ -94,7 +94,7 @@ export class ReferenceCompletionProvider implements vscode.CompletionItemProvide
                 item.sortText = value;
                 item.textEdit = new vscode.TextEdit(
                     entry.occurrence.replacementRange,
-                    formatYamlScalar(value, entry.occurrence.style)
+                    formatYamlCompletion(value, entry.occurrence.style)
                 );
 
                 const locations = entry.definitions

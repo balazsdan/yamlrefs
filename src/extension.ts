@@ -42,7 +42,9 @@ class ExtensionController implements vscode.Disposable, WorkspaceSessionLookup {
                 new ReferenceCompletionProvider(this),
                 ':',
                 ' ',
-                '-'
+                '-',
+                '"',
+                "'"
             ),
             vscode.languages.registerDefinitionProvider(
                 { language: 'yaml' },
