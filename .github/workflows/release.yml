@@ -30,6 +30,7 @@ jobs:
         run: |
           gh release create "v$VERSION" \
             ./*.vsix \
+            --repo "$GITHUB_REPOSITORY" \
             --title "v$VERSION" \
             --generate-notes \
             --target "$GITHUB_SHA"
