@@ -1,0 +1,12 @@
+pages:
+  - name: home
+    theme: light
+    environment: production
+
+  - name: preview
+    theme: dark
+    environment: staging
+
+  - name: broken-example
+    theme: does-not-exist
+    environment: development

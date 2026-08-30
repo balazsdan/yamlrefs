@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "definitions": {
+    "state": {
+      "paths": [
+        "/states/statedef/*/name"
+      ],
+      "references": [
+        "/actions/*/statematcher/statename",
+        "/transitions/*/from",
+        "/transitions/*/to"
+      ]
+    }
+  },
+  "externalDefinitions": {}
+}

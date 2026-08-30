@@ -1,0 +1,15 @@
+$include:
+  - ./domain.yaml
+
+actions:
+  - name: start
+    statematcher:
+      statename: running
+
+  - name: broken-example
+    statematcher:
+      statename: does-not-exist
+
+transitions:
+  - from: idle
+    to: running

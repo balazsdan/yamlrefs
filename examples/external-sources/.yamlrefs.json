@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "definitions": {},
+  "externalDefinitions": {
+    "theme": {
+      "references": [
+        "/pages/*/theme"
+      ],
+      "source": {
+        "type": "json",
+        "files": [
+          "settings/**/*.json"
+        ],
+        "paths": [
+          "/components/*/id"
+        ]
+      }
+    },
+    "environment": {
+      "references": [
+        "/pages/*/environment"
+      ],
+      "source": {
+        "type": "ini",
+        "files": [
+          "settings/**/*.ini"
+        ],
+        "sections": [
+          "Environments"
+        ],
+        "keys": [
+          "+Name"
+        ],
+        "from": "value"
+      }
+    }
+  }
+}

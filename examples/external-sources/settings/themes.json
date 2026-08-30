@@ -1,0 +1,13 @@
+{
+  "components": [
+    {
+      "id": "light"
+    },
+    {
+      "id": "dark"
+    },
+    {
+      "id": "high-contrast"
+    }
+  ]
+}
