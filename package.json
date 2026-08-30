@@ -35,7 +35,7 @@
     "watch": "node esbuild.js --watch",
     "compile-tests": "tsc -p ./",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
     "verify": "npm run compile && npm run compile-tests && npm run lint && npm test"
   },
   "devDependencies": {
