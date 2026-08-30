@@ -97,8 +97,34 @@
       "oneOf": [
         {
           "$ref": "#/$defs/iniSource"
+        },
+        {
+          "$ref": "#/$defs/jsonSource"
         }
       ]
+    },
+    "jsonSource": {
+      "title": "JSON definition source",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "files",
+        "paths"
+      ],
+      "properties": {
+        "type": {
+          "const": "json"
+        },
+        "files": {
+          "description": "JSON file globs relative to .yamlrefs.json.",
+          "$ref": "#/$defs/fileGlobs"
+        },
+        "paths": {
+          "description": "Path globs that identify definition scalar values in the matched JSON files.",
+          "$ref": "#/$defs/yamlPathGlobs"
+        }
+      }
     },
     "iniSource": {
       "title": "INI definition source",

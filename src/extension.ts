@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import { ExternalSourceRegistry } from './definitionSources';
 import { IniDefinitionSourceFactory } from './ini';
+import { JsonDefinitionSourceFactory } from './json';
 import {
     DiagnosticsController,
     IncludeDefinitionProvider,
@@ -30,7 +31,8 @@ class ExtensionController implements vscode.Disposable, WorkspaceSessionLookup {
         this.disposables.push(
             this.collection,
             this.diagnostics,
-            this.externalSources.register(new IniDefinitionSourceFactory())
+            this.externalSources.register(new IniDefinitionSourceFactory()),
+            this.externalSources.register(new JsonDefinitionSourceFactory())
         );
 
         const folders = vscode.workspace.workspaceFolders ?? [];
@@ -80,7 +82,7 @@ class ExtensionController implements vscode.Disposable, WorkspaceSessionLookup {
             })
         );
 
-        const sourceWatcher = vscode.workspace.createFileSystemWatcher('**/*.{yaml,yml,ini}');
+        const sourceWatcher = vscode.workspace.createFileSystemWatcher('**/*.{yaml,yml,ini,json}');
         const configWatcher = vscode.workspace.createFileSystemWatcher('**/.yamlrefs.json');
         this.disposables.push(sourceWatcher, configWatcher);
         this.disposables.push(
