@@ -83,13 +83,24 @@ export class ReferenceCompletionProvider implements vscode.CompletionItemProvide
         return [...byValue.entries()]
             .sort(([left], [right]) => left.localeCompare(right))
             .map(([value, entry]) => {
+                const definitions = new Map<string, DefinitionRecord>();
+                for (const definition of entry.definitions) {
+                    definitions.set(locationKey(definition), definition);
+                }
+
+                const uniqueDefinitions = [...definitions.values()];
+                const sourceKinds = new Set(uniqueDefinitions.map(sourceDescription));
+                const names = [...entry.names].join(', ');
                 const item = new vscode.CompletionItem(
-                    value,
+                    {
+                        label: value,
+                        description: `${names} reference \u00b7 ${[...sourceKinds].join(' + ')}`
+                    },
                     vscode.CompletionItemKind.Reference
                 );
-                const names = [...entry.names].join(', ');
-                const origins = new Set(entry.definitions.map(definition => definition.origin));
-                item.detail = `${names} reference · ${[...origins].join(' + ')}`;
+                item.detail = `${names} reference${uniqueDefinitions.length > 1
+                    ? ` \u00b7 ${uniqueDefinitions.length} definitions`
+                    : ''}`;
                 item.filterText = value;
                 item.sortText = value;
                 item.textEdit = new vscode.TextEdit(
@@ -97,14 +108,23 @@ export class ReferenceCompletionProvider implements vscode.CompletionItemProvide
                     formatYamlCompletion(value, entry.occurrence.style)
                 );
 
-                const locations = entry.definitions
-                    .slice(0, 5)
-                    .map(definition => vscode.workspace.asRelativePath(definition.uri, false));
-                if (locations.length > 0) {
-                    item.documentation = new vscode.MarkdownString(
-                        `Defined in ${locations.map(location => `\`${location}\``).join(', ')}`
-                    );
+                const documentation = new vscode.MarkdownString(undefined, true);
+                documentation.appendMarkdown(uniqueDefinitions.length === 1
+                    ? '**Defined in:**'
+                    : '**Defined in multiple locations:**');
+
+                for (const definition of uniqueDefinitions.slice(0, 5)) {
+                    documentation.appendMarkdown('\n\n- $(file) ');
+                    documentation.appendText(sourceLocation(definition));
+                    documentation.appendMarkdown(' - ');
+                    documentation.appendText(sourceDescription(definition));
                 }
+
+                if (uniqueDefinitions.length > 5) {
+                    documentation.appendMarkdown('\n\n');
+                    documentation.appendText(`...and ${uniqueDefinitions.length - 5} more.`);
+                }
+                item.documentation = documentation;
 
                 return item;
             });
@@ -209,7 +229,7 @@ export class ReferenceHoverProvider implements vscode.HoverProvider {
             for (const definition of definitions.values()) {
                 contents.appendMarkdown('\n\n- $(file) ');
                 contents.appendText(sourceLocation(definition));
-                contents.appendMarkdown(' — ');
+                contents.appendMarkdown(' - ');
                 contents.appendText(sourceDescription(definition));
             }
         });

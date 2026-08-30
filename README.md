@@ -112,7 +112,7 @@ the two theme names are available for completion and Go to Definition. Repeated 
 ## Editor features
 
 - Diagnostics for unknown references, invalid includes, missing includes, cycles, and source failures.
-- Completion for existing values, empty mapping values, and empty sequence items.
+- Completion for existing values, empty mapping values, and empty sequence items, with source type, file, and line details.
 - Hover details for references, including every matching definition file and line.
 - Go to Definition from `$include` filenames and YAML references, including the source value range for external definitions.
 - Automatic refresh after configuration, YAML, JSON, or INI changes.
