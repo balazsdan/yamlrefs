@@ -30,6 +30,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build
+        run: npm run compile
+
+      - name: Compile tests
+        run: npm run compile-tests
+
+      - name: Lint
+        run: npm run lint
+
       - name: Test
         run: dbus-run-session -- xvfb-run -a npm test
 

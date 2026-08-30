@@ -34,9 +34,9 @@
     "package": "npm run check-types && node esbuild.js --production",
     "watch": "node esbuild.js --watch",
     "compile-tests": "tsc -p ./",
-    "pretest": "npm run compile && npm run compile-tests && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test"
+    "verify": "npm run compile && npm run compile-tests && npm run lint && npm test"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
