@@ -103,10 +103,8 @@ export class ReferenceCompletionProvider implements vscode.CompletionItemProvide
                     : ''}`;
                 item.filterText = value;
                 item.sortText = value;
-                item.textEdit = new vscode.TextEdit(
-                    entry.occurrence.replacementRange,
-                    formatYamlCompletion(value, entry.occurrence.style)
-                );
+                item.range = entry.occurrence.replacementRange;
+                item.insertText = formatYamlCompletion(value, entry.occurrence.style);
 
                 const documentation = new vscode.MarkdownString(undefined, true);
                 documentation.appendMarkdown(uniqueDefinitions.length === 1
