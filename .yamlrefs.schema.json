@@ -1,6 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://yamlrefs.dev/schemas/yamlrefs.schema.json",
   "title": "YAML Reference Resolver configuration",
   "type": "object",
   "additionalProperties": false,
