@@ -8,6 +8,7 @@ import {
     IncludeDefinitionProvider,
     ReferenceCompletionProvider,
     ReferenceDefinitionProvider,
+    ReferenceHoverProvider,
     type WorkspaceSessionLookup
 } from './languageProviders';
 import { WorkspaceSession } from './workspaceSession';
@@ -51,6 +52,10 @@ class ExtensionController implements vscode.Disposable, WorkspaceSessionLookup {
             vscode.languages.registerDefinitionProvider(
                 { language: 'yaml' },
                 new ReferenceDefinitionProvider(this)
+            ),
+            vscode.languages.registerHoverProvider(
+                { language: 'yaml' },
+                new ReferenceHoverProvider(this)
             ),
             vscode.languages.registerDefinitionProvider(
                 { language: 'yaml' },

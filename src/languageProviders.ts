@@ -143,6 +143,81 @@ export class ReferenceDefinitionProvider implements vscode.DefinitionProvider {
     }
 }
 
+function sourceDescription(definition: DefinitionRecord): string {
+    if (definition.origin === 'internal') {
+        return 'internal YAML';
+    }
+
+    const extension = /\.([^./]+)$/.exec(definition.uri.path)?.[1];
+    return extension ? `external ${extension.toUpperCase()}` : 'external';
+}
+
+function sourceLocation(definition: DefinitionRecord): string {
+    const relativePath = vscode.workspace.asRelativePath(definition.uri, false);
+    return `${relativePath}:${definition.range.start.line + 1}`;
+}
+
+export class ReferenceHoverProvider implements vscode.HoverProvider {
+    constructor(private readonly sessions: WorkspaceSessionLookup) {}
+
+    async provideHover(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken
+    ): Promise<vscode.Hover | undefined> {
+        const session = this.sessions.sessionFor(document.uri);
+        if (!session) {
+            return undefined;
+        }
+
+        const occurrences = session.findReferencesAt(document, position)
+            .filter(occurrence => occurrence.value !== undefined && occurrence.value !== '');
+        if (occurrences.length === 0) {
+            return undefined;
+        }
+
+        const resolutions = await Promise.all(occurrences.map(async occurrence => ({
+            occurrence,
+            result: await session.resolve(document, occurrence, token)
+        })));
+        const contents = new vscode.MarkdownString(undefined, true);
+
+        resolutions.forEach(({ occurrence, result }, index) => {
+            if (index > 0) {
+                contents.appendMarkdown('\n\n---\n\n');
+            }
+
+            contents.appendMarkdown('$(references) **');
+            contents.appendText(`${occurrence.definitionName} reference`);
+            contents.appendMarkdown('**\n\n**Value:** ');
+            contents.appendText(occurrence.value ?? '');
+
+            const definitions = new Map<string, DefinitionRecord>();
+            for (const definition of result.matches) {
+                definitions.set(locationKey(definition), definition);
+            }
+
+            if (definitions.size === 0) {
+                contents.appendMarkdown('\n\n$(warning) No matching definition was found.');
+                return;
+            }
+
+            contents.appendMarkdown(definitions.size === 1
+                ? '\n\n**Defined in:**'
+                : '\n\n**Defined in multiple locations:**');
+
+            for (const definition of definitions.values()) {
+                contents.appendMarkdown('\n\n- $(file) ');
+                contents.appendText(sourceLocation(definition));
+                contents.appendMarkdown(' — ');
+                contents.appendText(sourceDescription(definition));
+            }
+        });
+
+        return new vscode.Hover(contents, occurrences[0].range);
+    }
+}
+
 export class IncludeDefinitionProvider implements vscode.DefinitionProvider {
     constructor(private readonly sessions: WorkspaceSessionLookup) {}
 
