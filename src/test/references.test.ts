@@ -52,6 +52,7 @@ suite('ReferenceScanner', () => {
         const scanner = new ReferenceScanner(storeWith(parsed));
         scanner.configure({
             version: 1,
+            includeKey: '$include',
             definitions: {
                 item: { paths: ['/items/*'], references: ['/refs/*'] }
             },
@@ -87,6 +88,7 @@ suite('ReferenceScanner', () => {
         const scanner = new ReferenceScanner(storeWith(parsed));
         scanner.configure({
             version: 1,
+            includeKey: '$include',
             definitions: {
                 shallow: { paths: ['/unused'], references: ['/a'] },
                 deep: { paths: ['/unused'], references: ['/a/b'] }

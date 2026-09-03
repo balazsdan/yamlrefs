@@ -6,11 +6,11 @@ Place `.yamlrefs.json` in the root of the VS Code workspace.
 
 ## Examples
 
-Open either [examples/includes](examples/includes) or [examples/external-sources](examples/external-sources) as the VS Code workspace root. The first demonstrates internal definitions across transitive `$include` files; the second loads definitions from JSON and INI files.
+Open either [examples/includes](examples/includes) or [examples/external-sources](examples/external-sources) as the VS Code workspace root. The first demonstrates internal definitions across transitive include files with a custom include key; the second loads definitions from JSON and INI files.
 
 ## Internal definitions
 
-Internal definitions are visible only from the edited YAML document and YAML files reachable through `$include`.
+Internal definitions are visible only from the edited YAML document and YAML files reachable through the configured include key.
 
 ```json
 {
@@ -42,6 +42,22 @@ $include:
 ```
 
 Paths are relative to the including file. Includes are transitive, and missing files or cycles produce diagnostics.
+
+The root key defaults to `$include`. Set `includeKey` in `.yamlrefs.json` to use a different key:
+
+```json
+{
+  "version": 1,
+  "includeKey": "includes",
+  "definitions": {},
+  "externalDefinitions": {}
+}
+```
+
+```yaml
+includes:
+  - ./components.yaml
+```
 
 ## External JSON definitions
 

@@ -17,6 +17,7 @@ function resolverFor(
     const documents = new Map(included.map(document => [document.uri.toString(), document]));
     const opened: string[] = [];
     const store = {
+        includeKey: '$include',
         get: () => root,
         open: async (uri: vscode.Uri) => {
             opened.push(uri.toString());

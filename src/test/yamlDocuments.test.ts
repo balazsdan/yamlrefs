@@ -52,6 +52,17 @@ suite('YamlDocumentParser', () => {
         equal(scalar.issues[0].message.startsWith('"$include" must be a list'), true);
         equal(duplicate.issues[0].message.startsWith('Only one root-level'), true);
     });
+
+    test('reads includes from a configured root key', () => {
+        const parsed = new YamlDocumentParser().parse(textDocument([
+            '$include:',
+            '  - ./ignored.yaml',
+            'includes:',
+            '  - ./custom.yaml'
+        ].join('\n')), 'includes');
+
+        deepStrictEqual(parsed.includes.map(include => include.rawPath), ['./custom.yaml']);
+    });
 });
 
 suite('YamlDocumentStore', () => {
@@ -76,6 +87,24 @@ suite('YamlDocumentStore', () => {
         store.clear();
         store.get(document);
         equal(parser.calls, 3);
+    });
+
+    test('invalidates cached documents when the include key changes', () => {
+        const store = new YamlDocumentStore(new YamlDocumentParser());
+        const document = textDocument([
+            '$include:',
+            '  - ./default.yaml',
+            'includes:',
+            '  - ./custom.yaml'
+        ].join('\n'));
+
+        deepStrictEqual(store.get(document).includes.map(include => include.rawPath), [
+            './default.yaml'
+        ]);
+        store.configure('includes');
+        deepStrictEqual(store.get(document).includes.map(include => include.rawPath), [
+            './custom.yaml'
+        ]);
     });
 
     test('honors cancellation before opening a document', async () => {

@@ -61,7 +61,7 @@ export class IncludeGraphResolver {
                     issues.push({
                         uri: parsed.uri,
                         range: includeRange(parsed.document, include.start, include.end),
-                        message: `Circular "$include" detected: ${include.rawPath}`,
+                        message: `Circular "${this.documents.includeKey}" detected: ${include.rawPath}`,
                         severity: vscode.DiagnosticSeverity.Error,
                         code: 'circular-include'
                     });

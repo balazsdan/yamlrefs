@@ -22,7 +22,7 @@ async function exampleSession(name: string): Promise<WorkspaceSession> {
 }
 
 suite('WorkspaceSession functional', () => {
-    test('resolves definitions through transitive includes', async () => {
+    test('resolves definitions through transitive includes using the configured key', async () => {
         const session = await exampleSession('includes');
         const document = await vscode.workspace.openTextDocument(
             vscode.Uri.joinPath(session.folder.uri, 'workflow.yaml')

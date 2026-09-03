@@ -8,6 +8,7 @@ import {
     type DefinitionSource
 } from './definitionSources';
 import { IncludeGraphResolver } from './includeGraph';
+import { DEFAULT_INCLUDE_KEY } from './model';
 import type {
     ConfigIssue,
     DefinitionContext,
@@ -85,6 +86,7 @@ export class WorkspaceSession implements vscode.Disposable {
                 severity: vscode.DiagnosticSeverity.Error
             }];
             this.configured = false;
+            this.documents.configure(DEFAULT_INCLUDE_KEY);
             this.index.clear();
             this.scanner.configure(undefined);
             this.reloadEmitter.fire();
@@ -99,11 +101,14 @@ export class WorkspaceSession implements vscode.Disposable {
         this.configured = loaded.config !== undefined;
 
         if (!loaded.config) {
+            this.documents.configure(DEFAULT_INCLUDE_KEY);
             this.index.clear();
             this.scanner.configure(undefined);
             this.reloadEmitter.fire();
             return;
         }
+
+        this.documents.configure(loaded.config.includeKey);
 
         const sources = new Map<string, DefinitionSource>();
         for (const [definitionName, definition] of Object.entries(loaded.config.definitions)) {

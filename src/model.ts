@@ -11,6 +11,8 @@ export type IssueCode =
     | 'invalid-include'
     | 'source-error';
 
+export const DEFAULT_INCLUDE_KEY = '$include';
+
 export interface InternalDefinitionConfig {
     readonly paths: readonly string[];
     readonly references: readonly string[];
@@ -29,6 +31,7 @@ export interface ExternalDefinitionConfig {
 
 export interface YamlRefsConfig {
     readonly version: 1;
+    readonly includeKey: string;
     readonly definitions: Readonly<Record<string, InternalDefinitionConfig>>;
     readonly externalDefinitions: Readonly<Record<string, ExternalDefinitionConfig>>;
 }

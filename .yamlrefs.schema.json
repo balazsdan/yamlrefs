@@ -11,8 +11,15 @@
       "const": 1,
       "description": "Configuration format version."
     },
+    "includeKey": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S",
+      "default": "$include",
+      "description": "Root-level YAML key whose list contains included file paths. Defaults to $include."
+    },
     "definitions": {
-      "description": "Definitions found in the edited YAML file or its transitive $include graph.",
+      "description": "Definitions found in the edited YAML file or its transitive include graph.",
       "$ref": "#/$defs/internalDefinitions"
     },
     "externalDefinitions": {

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import { ExternalSourceRegistry } from './definitionSources';
 import { validateGlob } from './globs';
+import { DEFAULT_INCLUDE_KEY } from './model';
 import type {
     ConfigIssue,
     ConfigLoadResult,
@@ -70,13 +71,23 @@ export class ConfigValidator {
 
         unknownProperties(
             raw,
-            new Set(['version', 'definitions', 'externalDefinitions']),
+            new Set(['version', 'includeKey', 'definitions', 'externalDefinitions']),
             key => `Unknown configuration property "${key}".`,
             problems
         );
 
         if (raw.version !== 1) {
             problems.push('Configuration "version" must be 1.');
+        }
+
+        const includeKeyValue = raw.includeKey === undefined
+            ? DEFAULT_INCLUDE_KEY
+            : raw.includeKey;
+        let includeKey = DEFAULT_INCLUDE_KEY;
+        if (typeof includeKeyValue !== 'string' || includeKeyValue.trim() === '') {
+            problems.push('Configuration "includeKey" must be a non-empty string.');
+        } else {
+            includeKey = includeKeyValue;
         }
 
         const definitionsValue = raw.definitions ?? {};
@@ -115,6 +126,7 @@ export class ConfigValidator {
         return {
             config: {
                 version: 1,
+                includeKey,
                 definitions,
                 externalDefinitions
             },

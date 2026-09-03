@@ -16,7 +16,24 @@ function validator(): ConfigValidator {
 suite('ConfigValidator', () => {
     test('defaults omitted definition collections', () => {
         deepStrictEqual(validator().validate({ version: 1 }), {
-            config: { version: 1, definitions: {}, externalDefinitions: {} },
+            config: {
+                version: 1,
+                includeKey: '$include',
+                definitions: {},
+                externalDefinitions: {}
+            },
+            problems: []
+        });
+    });
+
+    test('accepts a custom include key', () => {
+        deepStrictEqual(validator().validate({ version: 1, includeKey: 'includes' }), {
+            config: {
+                version: 1,
+                includeKey: 'includes',
+                definitions: {},
+                externalDefinitions: {}
+            },
             problems: []
         });
     });
@@ -24,6 +41,16 @@ suite('ConfigValidator', () => {
     const invalidCases: readonly [string, unknown, string][] = [
         ['requires an object root', [], 'The configuration root must be a JSON object.'],
         ['requires version 1', { version: 2 }, 'Configuration "version" must be 1.'],
+        [
+            'requires a non-empty include key',
+            { version: 1, includeKey: '  ' },
+            'Configuration "includeKey" must be a non-empty string.'
+        ],
+        [
+            'requires a string include key',
+            { version: 1, includeKey: null },
+            'Configuration "includeKey" must be a non-empty string.'
+        ],
         [
             'requires internal paths',
             { version: 1, definitions: { item: { paths: [], references: ['/item'] } } },

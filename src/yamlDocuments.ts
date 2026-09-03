@@ -8,6 +8,7 @@ import type {
     YamlScalarNode,
     YamlScalarStyle
 } from './model';
+import { DEFAULT_INCLUDE_KEY } from './model';
 
 function offsetsFor(node: unknown): readonly [number, number] | undefined {
     if (!node || typeof node !== 'object' || !('range' in node)) {
@@ -47,7 +48,10 @@ function rangeFromOffsets(
 }
 
 export class YamlDocumentParser {
-    parse(document: vscode.TextDocument): ParsedYamlDocument {
+    parse(
+        document: vscode.TextDocument,
+        includeKey = DEFAULT_INCLUDE_KEY
+    ): ParsedYamlDocument {
         const parsed = parseDocument(document.getText(), {
             prettyErrors: false,
             uniqueKeys: false
@@ -57,7 +61,7 @@ export class YamlDocumentParser {
         const issues: SourceIssue[] = [];
 
         this.walk(parsed.contents, [], scalars);
-        this.readIncludes(document, parsed.contents, includes, issues);
+        this.readIncludes(document, parsed.contents, includeKey, includes, issues);
 
         return {
             uri: document.uri,
@@ -119,6 +123,7 @@ export class YamlDocumentParser {
     private readIncludes(
         document: vscode.TextDocument,
         root: unknown,
+        includeKey: string,
         output: IncludeEntry[],
         issues: SourceIssue[]
     ): void {
@@ -127,7 +132,7 @@ export class YamlDocumentParser {
         }
 
         const includePairs = root.items.filter(pair =>
-            isScalar(pair.key) && String(pair.key.value) === '$include');
+            isScalar(pair.key) && String(pair.key.value) === includeKey);
 
         if (includePairs.length > 1) {
             for (const pair of includePairs.slice(1)) {
@@ -135,7 +140,7 @@ export class YamlDocumentParser {
                 issues.push({
                     uri: document.uri,
                     range: rangeFromOffsets(document, offsets[0], offsets[1]),
-                    message: 'Only one root-level "$include" key is allowed; put every include in its list.',
+                    message: `Only one root-level "${includeKey}" key is allowed; put every include in its list.`,
                     severity: vscode.DiagnosticSeverity.Error,
                     code: 'invalid-include'
                 });
@@ -154,7 +159,7 @@ export class YamlDocumentParser {
             issues.push({
                 uri: document.uri,
                 range: rangeFromOffsets(document, offsets[0], offsets[1]),
-                message: '"$include" must be a list of YAML file paths, even when it contains one file.',
+                message: `"${includeKey}" must be a list of YAML file paths, even when it contains one file.`,
                 severity: vscode.DiagnosticSeverity.Error,
                 code: 'invalid-include'
             });
@@ -167,7 +172,7 @@ export class YamlDocumentParser {
                 issues.push({
                     uri: document.uri,
                     range: rangeFromOffsets(document, offsets[0], offsets[1]),
-                    message: 'Every "$include" list item must be a non-empty YAML file path.',
+                    message: `Every "${includeKey}" list item must be a non-empty YAML file path.`,
                     severity: vscode.DiagnosticSeverity.Error,
                     code: 'invalid-include'
                 });
@@ -188,8 +193,13 @@ export class YamlDocumentStore {
         readonly version: number;
         readonly parsed: ParsedYamlDocument;
     }>();
+    private configuredIncludeKey = DEFAULT_INCLUDE_KEY;
 
     constructor(private readonly parser: YamlDocumentParser) {}
+
+    get includeKey(): string {
+        return this.configuredIncludeKey;
+    }
 
     get(document: vscode.TextDocument): ParsedYamlDocument {
         const key = document.uri.toString();
@@ -199,9 +209,18 @@ export class YamlDocumentStore {
             return cached.parsed;
         }
 
-        const parsed = this.parser.parse(document);
+        const parsed = this.parser.parse(document, this.configuredIncludeKey);
         this.cache.set(key, { version: document.version, parsed });
         return parsed;
+    }
+
+    configure(includeKey: string): void {
+        if (includeKey === this.configuredIncludeKey) {
+            return;
+        }
+
+        this.configuredIncludeKey = includeKey;
+        this.clear();
     }
 
     async open(
